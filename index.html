@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Futuristic J.A.R.V.I.S Boot Sequence - Console Logging</title>
+  <title>Futuristic J.A.R.V.I.S Boot Sequence - Hybrid GeoWeather</title>
   <!-- Import Inconsolata font -->
   <link
     href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&display=swap"
@@ -34,7 +34,6 @@
       font-family: 'Inconsolata', monospace;
       color: #fff;
     }
-
     /* Main container for centering content */
     #grid-container {
       width: 100vw;
@@ -45,7 +44,6 @@
       align-items: center;
       position: relative;
     }
-
     /* Boot Button Styling (outline only) */
     #boot-btn {
       background-color: transparent;
@@ -66,7 +64,6 @@
     #boot-btn.fade-out {
       opacity: 0;
     }
-
     /* Boot Sequence Container */
     #boot-sequence {
       display: none; /* Hidden initially */
@@ -104,7 +101,6 @@
       border: 1px solid #fff;
       min-height: 80px;
     }
-
     /* Banner-style J.A.R.V.I.S Title with Typewriter Effect */
     #jarvisTitle {
       display: none; /* Hidden initially */
@@ -126,7 +122,6 @@
       from { width: 0; }
       to { width: 11ch; }
     }
-
     /* Info Box Styling: Positioned Top Right with Centered Content */
     #info-box {
       position: absolute;
@@ -162,8 +157,7 @@
   <div id="grid-container">
     <!-- Boot Button -->
     <button id="boot-btn">BOOT JAR.VIS</button>
-
-    <!-- Boot Sequence Container: Percentage, Progress Bar, and Terminal Output -->
+    <!-- Boot Sequence Container: Percentage, Progress Bar, Terminal Output -->
     <div id="boot-sequence">
       <div id="progress-percentage">0%</div>
       <div id="progress-container">
@@ -171,13 +165,11 @@
       </div>
       <div id="terminal-output"></div>
     </div>
-
     <!-- Banner-style J.A.R.V.I.S Title with Typewriter Effect -->
     <h1 id="jarvisTitle">
       <span id="typewriter">J.A.R.V.I.S</span>
     </h1>
-
-    <!-- Info Box displayed in the top-right corner -->
+    <!-- Info Box in the top-right corner -->
     <div id="info-box">
       <div class="info-header">
         <span id="sync-text">SYNCED</span>
@@ -189,7 +181,7 @@
       </div>
     </div>
   </div>
-
+  
   <script>
     // Logging function: logs all events exclusively to the console.
     function logEvent(message, type) {
@@ -236,7 +228,7 @@
         }, 1000);
       });
 
-      // Simulate progress with terminal output updates.
+      // Simulate progress along with terminal output updates.
       function simulateProgress(duration) {
         const updates = [
           { threshold: 10, message: ">> Initializing core systems...", printed: false },
@@ -255,7 +247,7 @@
           let percent = Math.min((elapsed / duration) * 100, 100);
           percent = Math.floor(percent);
 
-          // Update percentage display and progress bar width.
+          // Update the progress percentage and progress bar accordingly.
           progressPercentage.innerText = percent + "%";
           progressBar.style.width = percent + "%";
 
@@ -281,14 +273,14 @@
         }, 50);
       }
 
-      // After typewriter animation ends, remove the blinking caret and show info box.
+      // When the typewriter animation completes, remove the caret and show the info box.
       typewriter.addEventListener("animationend", function () {
         typewriter.style.borderRight = "none";
         logEvent("Typewriter animation complete.");
         setTimeout(showInfoBox, 1000);
       });
 
-      // Display the info box and start the updates for date/time and weather.
+      // Display the info box and start updating date, time, and weather.
       function showInfoBox() {
         const infoBox = document.getElementById("info-box");
         infoBox.style.display = "flex";
@@ -309,8 +301,8 @@
         document.getElementById("time").innerText = now.toLocaleTimeString();
       }
 
-      // Retrieve live weather data by reverse-geocoding the user's position to obtain a city name,
-      // then query wttr.in with the resulting city name.
+      // Retrieve live weather data. First, attempt native geolocation.
+      // If that fails, fallback to IP-based geolocation using ip-api.com.
       function updateWeather() {
         if (navigator.geolocation) {
           logEvent("Requesting geolocation...");
@@ -343,18 +335,45 @@
                 .catch(err => {
                   document.getElementById("weather").innerText = "Weather data unavailable";
                   logEvent("Weather API Error: " + err, "error");
+                  fallbackToIP();
                 });
             },
             error => {
-              document.getElementById("weather").innerText = "Weather data unavailable";
-              logEvent("Geolocation Error [code " + error.code + "]: " + error.message, "error");
+              logEvent("Native Geolocation Error [code " + error.code + "]: " + error.message + ". Falling back to IP geolocation.", "error");
+              fallbackToIP();
             },
             { timeout: 10000 }
           );
         } else {
           document.getElementById("weather").innerText = "Geolocation not supported";
           logEvent("Geolocation not supported by this browser.", "error");
+          fallbackToIP();
         }
+      }
+
+      // Fallback function: Use IP-based geolocation via ip-api.com to get a city name.
+      function fallbackToIP() {
+        logEvent("Using IP-based geolocation (ip-api.com) as fallback.");
+        fetch("https://ip-api.com/json/")
+          .then(response => response.json())
+          .then(data => {
+            const city = data.city || "Unknown";
+            logEvent("IP geolocation result: " + city);
+            const url = `https://wttr.in/@${encodeURIComponent(city)}?format=j1`;
+            logEvent("Querying weather for " + city + " using URL: " + url);
+            return fetch(url)
+              .then(response => response.json())
+              .then(data => {
+                const temp = data.current_condition[0].temp_C;
+                const description = data.current_condition[0].weatherDesc[0].value;
+                document.getElementById("weather").innerText = `${city} | ${temp}°C, ${description}`;
+                logEvent("Weather updated via IP fallback: " + `${city} | ${temp}°C, ${description}`);
+              });
+          })
+          .catch(err => {
+            document.getElementById("weather").innerText = "Weather data unavailable";
+            logEvent("IP Geolocation Error: " + err, "error");
+          });
       }
     });
   </script>
