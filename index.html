@@ -1,50 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Futuristic J.A.R.V.I.S Boot Sequence - Hybrid GeoWeather</title>
-  <!-- Import Inconsolata font -->
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&display=swap"
-    rel="stylesheet"
-  />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Futuristic J.A.R.V.I.S Interface</title>
+  <!-- Import Inconsolata Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Import Font Awesome for the microphone icon -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-papXtj68WQRnoZlRm0HOVZPbMJsfH4a0xuY0mXkRn9tg4LtX8/EP8vbdqwQl1Z7zOZrmFervaHEaahGQG+D9ug==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
-    /* Global Styles & Background */
+    /* Basic resets */
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
+      overflow: hidden;
+    }
+    /* Particles.js container behind everything */
+    #particles-js {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+    }
+    /* Grid container (with ambient grid background) */
+    #grid-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
       background-color: #000;
-      background-image: repeating-linear-gradient(
-          0deg,
-          rgba(255, 255, 255, 0.05) 0px,
-          rgba(255, 255, 255, 0.05) 1px,
-          transparent 1px,
-          transparent 20px
-        ),
-        repeating-linear-gradient(
-          90deg,
-          rgba(255, 255, 255, 0.05) 0px,
-          rgba(255, 255, 255, 0.05) 1px,
-          transparent 1px,
-          transparent 20px
-        );
+      background-image: 
+        repeating-linear-gradient(0deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 1px, transparent 1px, transparent 20px),
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 1px, transparent 1px, transparent 20px);
       background-size: 20px 20px;
       font-family: 'Inconsolata', monospace;
       color: #fff;
-    }
-    /* Main container for centering content */
-    #grid-container {
-      width: 100vw;
-      height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      position: relative;
+      z-index: 1;
     }
-    /* Boot Button Styling (outline only) */
+    /* Boot button styling (outline only) */
     #boot-btn {
       background-color: transparent;
       border: 3px solid #fff;
@@ -64,14 +61,15 @@
     #boot-btn.fade-out {
       opacity: 0;
     }
-    /* Boot Sequence Container */
+    /* Boot sequence container */
     #boot-sequence {
-      display: none; /* Hidden initially */
+      display: none;
       width: 0;
       max-width: 500px;
       transition: width 2s ease;
       margin: 20px 0;
       text-align: left;
+      z-index: 2;
     }
     #progress-percentage {
       font-size: 1rem;
@@ -84,10 +82,8 @@
       height: 20px;
       border: 1px solid #fff;
       margin-bottom: 10px;
-      position: relative;
       overflow: hidden;
     }
-    /* Inner progress bar (plain fill) */
     #progress-bar {
       width: 0%;
       height: 100%;
@@ -101,12 +97,13 @@
       border: 1px solid #fff;
       min-height: 80px;
     }
-    /* Banner-style J.A.R.V.I.S Title with Typewriter Effect */
+    /* Banner-style J.A.R.V.I.S title with typewriter effect */
     #jarvisTitle {
-      display: none; /* Hidden initially */
+      display: none;
       font-size: calc(4rem + 5vw);
-      text-shadow: 4px 4px 0 #000; /* Black highlight for banner effect */
+      text-shadow: 4px 4px 0 #000;
       margin: 20px 0;
+      z-index: 2;
     }
     #typewriter {
       display: inline-block;
@@ -122,7 +119,7 @@
       from { width: 0; }
       to { width: 11ch; }
     }
-    /* Info Box Styling: Positioned Top Right with Centered Content */
+    /* Info box styling (top right) */
     #info-box {
       position: absolute;
       top: 20px;
@@ -140,6 +137,7 @@
       justify-content: center;
       align-items: center;
       text-align: center;
+      z-index: 3;
     }
     #info-box.visible {
       opacity: 1;
@@ -151,13 +149,81 @@
       right: 10px;
       font-size: 0.8rem;
     }
+    /* Red microphone button styling */
+    #mic-button {
+      position: fixed;
+      bottom: 20px;
+      left: calc(50% - 30px);
+      width: 60px;
+      height: 60px;
+      background-color: #e74c3c;
+      border: none;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 1.5rem;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      z-index: 3;
+    }
+    /* Chat UI styling */
+    #chat-ui {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #111;
+      color: #fff;
+      font-family: 'Inconsolata', monospace;
+      z-index: 10;
+      flex-direction: column;
+    }
+    #chat-header {
+      padding: 20px;
+      background-color: #222;
+      font-size: 1.5rem;
+      text-align: center;
+    }
+    #chat-conversation {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    #chat-input-container {
+      padding: 10px;
+      background-color: #222;
+      display: flex;
+    }
+    #chat-input {
+      flex: 1;
+      padding: 10px;
+      font-size: 1rem;
+      border: none;
+      outline: none;
+    }
+    #chat-send {
+      padding: 10px 20px;
+      background-color: #e74c3c;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      color: #fff;
+    }
   </style>
 </head>
 <body>
+  <!-- Particle background container -->
+  <div id="particles-js"></div>
+  
+  <!-- Main UI container with grid background -->
   <div id="grid-container">
     <!-- Boot Button -->
-    <button id="boot-btn">BOOT JAR.VIS</button>
-    <!-- Boot Sequence Container: Percentage, Progress Bar, Terminal Output -->
+    <button id="boot-btn">BOOT J.A.R.V.I.S</button>
+    
+    <!-- Boot Sequence Container -->
     <div id="boot-sequence">
       <div id="progress-percentage">0%</div>
       <div id="progress-container">
@@ -165,15 +231,15 @@
       </div>
       <div id="terminal-output"></div>
     </div>
-    <!-- Banner-style J.A.R.V.I.S Title with Typewriter Effect -->
+    
+    <!-- Banner-style J.A.R.V.I.S Title -->
     <h1 id="jarvisTitle">
       <span id="typewriter">J.A.R.V.I.S</span>
     </h1>
-    <!-- Info Box in the top-right corner -->
+    
+    <!-- Info Box -->
     <div id="info-box">
-      <div class="info-header">
-        <span id="sync-text">SYNCED</span>
-      </div>
+      <div class="info-header"><span id="sync-text">SYNCED</span></div>
       <div class="info-content">
         <div id="date"></div>
         <div id="time"></div>
@@ -182,8 +248,43 @@
     </div>
   </div>
   
+  <!-- Red Microphone Button -->
+  <button id="mic-button"><i class="fas fa-microphone"></i></button>
+  
+  <!-- Chat UI for conversation with Jarvis -->
+  <div id="chat-ui">
+    <div id="chat-header">J.A.R.V.I.S Chat</div>
+    <div id="chat-conversation"></div>
+    <div id="chat-input-container">
+      <input type="text" id="chat-input" placeholder="Type your message...">
+      <button id="chat-send">Send</button>
+    </div>
+  </div>
+  
+  <!-- Scripts -->
+  <!-- Include particles.js -->
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
   <script>
-    // Logging function: logs all events exclusively to the console.
+    // Initialize Particles.js with a sample configuration.
+    particlesJS("particles-js", {
+      "particles": {
+        "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+        "color": { "value": "#ffffff" },
+        "shape": { "type": "circle", "stroke": { "width": 0, "color": "#000000" }, "polygon": { "nb_sides": 5 } },
+        "opacity": { "value": 0.5, "random": false },
+        "size": { "value": 3, "random": true },
+        "line_linked": { "enable": true, "distance": 150, "color": "#ffffff", "opacity": 0.4, "width": 1 },
+        "move": { "enable": true, "speed": 6, "direction": "none", "random": false, "straight": false, "out_mode": "out" }
+      },
+      "interactivity": {
+        "detect_on": "canvas",
+        "events": { "onhover": { "enable": true, "mode": "repulse" }, "onclick": { "enable": true, "mode": "push" }, "resize": true },
+        "modes": { "repulse": { "distance": 200 } }
+      },
+      "retina_detect": true
+    });
+    
+    // Logging function: logs events exclusively to the console.
     function logEvent(message, type) {
       const timeStamp = new Date().toLocaleTimeString();
       if (type === "error") {
@@ -192,7 +293,7 @@
         console.log(timeStamp + " - " + message);
       }
     }
-
+    
     document.addEventListener("DOMContentLoaded", function () {
       const bootBtn = document.getElementById("boot-btn");
       const bootSequence = document.getElementById("boot-sequence");
@@ -201,17 +302,22 @@
       const terminalOutput = document.getElementById("terminal-output");
       const jarvisTitle = document.getElementById("jarvisTitle");
       const typewriter = document.getElementById("typewriter");
-
+      const micButton = document.getElementById("mic-button");
+      const chatUI = document.getElementById("chat-ui");
+      const chatConversation = document.getElementById("chat-conversation");
+      const chatInput = document.getElementById("chat-input");
+      const chatSend = document.getElementById("chat-send");
+      
       logEvent("Page loaded. Awaiting user action.");
-
+      
       bootBtn.addEventListener("click", function () {
         logEvent("Boot button clicked.");
         bootBtn.classList.add("fade-out");
         setTimeout(function () {
           logEvent("Boot button faded out.");
           bootBtn.style.display = "none";
-
-          // Display and expand the boot sequence container.
+          
+          // Show and expand boot sequence container.
           bootSequence.style.display = "block";
           logEvent("Boot sequence container displayed. Expanding...");
           bootSequence.style.width = "0";
@@ -219,16 +325,16 @@
             bootSequence.style.width = "80%";
             logEvent("Boot sequence container expanding to 80% width.");
           }, 50);
-
-          // Start progress simulation after a brief delay.
+          
+          // Start progress simulation.
           setTimeout(function () {
             logEvent("Starting progress simulation over 10 seconds.");
             simulateProgress(10000);
           }, 2050);
         }, 1000);
       });
-
-      // Simulate progress along with terminal output updates.
+      
+      // Simulate boot progress.
       function simulateProgress(duration) {
         const updates = [
           { threshold: 10, message: ">> Initializing core systems...", printed: false },
@@ -240,17 +346,16 @@
           { threshold: 90, message: ">> Initiating self-diagnostics...", printed: false },
           { threshold: 100, message: ">> Boot sequence complete.", printed: false }
         ];
-
+        
         const startTime = Date.now();
         const timer = setInterval(function () {
           const elapsed = Date.now() - startTime;
           let percent = Math.min((elapsed / duration) * 100, 100);
           percent = Math.floor(percent);
-
-          // Update the progress percentage and progress bar accordingly.
+          
           progressPercentage.innerText = percent + "%";
           progressBar.style.width = percent + "%";
-
+          
           updates.forEach(update => {
             if (!update.printed && percent >= update.threshold) {
               terminalOutput.innerHTML += update.message + "<br>";
@@ -258,7 +363,7 @@
               update.printed = true;
             }
           });
-
+          
           if (percent >= 100) {
             clearInterval(timer);
             logEvent("Progress simulation complete.");
@@ -272,15 +377,18 @@
           }
         }, 50);
       }
-
-      // When the typewriter animation completes, remove the caret and show the info box.
+      
+      // After typewriter animation, remove caret and show info box and microphone button.
       typewriter.addEventListener("animationend", function () {
         typewriter.style.borderRight = "none";
         logEvent("Typewriter animation complete.");
-        setTimeout(showInfoBox, 1000);
+        setTimeout(function () {
+          showInfoBox();
+          showMicButton();
+        }, 1000);
       });
-
-      // Display the info box and start updating date, time, and weather.
+      
+      // Show info box.
       function showInfoBox() {
         const infoBox = document.getElementById("info-box");
         infoBox.style.display = "flex";
@@ -293,16 +401,70 @@
         updateWeather();
         setInterval(updateWeather, 60000);
       }
-
-      // Update the date and time in the info box.
+      
+      // Show the microphone button.
+      function showMicButton() {
+        micButton.style.display = "flex";
+        logEvent("Microphone button displayed.");
+      }
+      
+      // When microphone button is clicked, transition to Chat UI.
+      micButton.addEventListener("click", function () {
+        logEvent("Microphone button clicked. Transitioning to Chat UI.");
+        // Hide current UI elements.
+        document.getElementById("grid-container").style.display = "none";
+        micButton.style.display = "none";
+        // Show chat UI.
+        chatUI.style.display = "flex";
+      });
+      
+      // Chat UI: send message on button click.
+      chatSend.addEventListener("click", function () {
+        sendChatMessage();
+      });
+      
+      // Allow sending messages by pressing Enter.
+      chatInput.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          sendChatMessage();
+        }
+      });
+      
+      // Function to send a chat message.
+      function sendChatMessage() {
+        const message = chatInput.value.trim();
+        if (message !== "") {
+          appendChatMessage("You", message);
+          chatInput.value = "";
+          // Simulate Jarvis response after a delay.
+          setTimeout(() => {
+            const response = getJarvisResponse(message);
+            appendChatMessage("Jarvis", response);
+          }, 1000);
+        }
+      }
+      
+      // Append a message to the chat conversation.
+      function appendChatMessage(sender, text) {
+        const messageElem = document.createElement("div");
+        messageElem.innerHTML = `<strong>${sender}:</strong> ${text}`;
+        chatConversation.appendChild(messageElem);
+        chatConversation.scrollTop = chatConversation.scrollHeight;
+      }
+      
+      // Simple response logic for Jarvis.
+      function getJarvisResponse(userMessage) {
+        return "I'm here to assist you. You said: " + userMessage;
+      }
+      
+      // Update date and time.
       function updateDateTime() {
         const now = new Date();
         document.getElementById("date").innerText = now.toLocaleDateString();
         document.getElementById("time").innerText = now.toLocaleTimeString();
       }
-
-      // Retrieve live weather data. First, attempt native geolocation.
-      // If that fails, fallback to IP-based geolocation using ip-api.com.
+      
+      // Update weather using native geolocation and fallback to ip-api.com.
       function updateWeather() {
         if (navigator.geolocation) {
           logEvent("Requesting geolocation...");
@@ -350,8 +512,8 @@
           fallbackToIP();
         }
       }
-
-      // Fallback function: Use IP-based geolocation via ip-api.com to get a city name.
+      
+      // Fallback to IP-based geolocation using ip-api.com.
       function fallbackToIP() {
         logEvent("Using IP-based geolocation (ip-api.com) as fallback.");
         fetch("https://ip-api.com/json/")
