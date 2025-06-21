@@ -109,7 +109,7 @@
     #jarvisTitle {
       display: none; /* Hidden initially */
       font-size: calc(4rem + 5vw);
-      text-shadow: 4px 4px 0 #000; /* Black highlight */
+      text-shadow: 4px 4px 0 #000; /* Black highlight for banner effect */
       margin: 20px 0;
     }
     #typewriter {
@@ -163,7 +163,7 @@
     <!-- Boot Button -->
     <button id="boot-btn">BOOT JAR.VIS</button>
 
-    <!-- Boot Sequence Container: Percentage, Progress Bar, Terminal Output -->
+    <!-- Boot Sequence Container: Percentage, Progress Bar, and Terminal Output -->
     <div id="boot-sequence">
       <div id="progress-percentage">0%</div>
       <div id="progress-container">
@@ -177,7 +177,7 @@
       <span id="typewriter">J.A.R.V.I.S</span>
     </h1>
 
-    <!-- Info Box in the top-right corner -->
+    <!-- Info Box displayed in the top-right corner -->
     <div id="info-box">
       <div class="info-header">
         <span id="sync-text">SYNCED</span>
@@ -219,7 +219,7 @@
           logEvent("Boot button faded out.");
           bootBtn.style.display = "none";
 
-          // Show and expand boot sequence container.
+          // Display and expand the boot sequence container.
           bootSequence.style.display = "block";
           logEvent("Boot sequence container displayed. Expanding...");
           bootSequence.style.width = "0";
@@ -228,7 +228,7 @@
             logEvent("Boot sequence container expanding to 80% width.");
           }, 50);
 
-          // Start the progress simulation after a brief delay.
+          // Start progress simulation after a brief delay.
           setTimeout(function () {
             logEvent("Starting progress simulation over 10 seconds.");
             simulateProgress(10000);
@@ -236,7 +236,7 @@
         }, 1000);
       });
 
-      // Function to simulate progress and log terminal output updates.
+      // Simulate progress with terminal output updates.
       function simulateProgress(duration) {
         const updates = [
           { threshold: 10, message: ">> Initializing core systems...", printed: false },
@@ -255,7 +255,7 @@
           let percent = Math.min((elapsed / duration) * 100, 100);
           percent = Math.floor(percent);
 
-          // Update percentage display and progress bar.
+          // Update percentage display and progress bar width.
           progressPercentage.innerText = percent + "%";
           progressBar.style.width = percent + "%";
 
@@ -281,14 +281,14 @@
         }, 50);
       }
 
-      // When typewriter animation ends, remove the caret and show the info box.
+      // After typewriter animation ends, remove the blinking caret and show info box.
       typewriter.addEventListener("animationend", function () {
         typewriter.style.borderRight = "none";
         logEvent("Typewriter animation complete.");
         setTimeout(showInfoBox, 1000);
       });
 
-      // Function to display the info box and start date/time/weather updates.
+      // Display the info box and start the updates for date/time and weather.
       function showInfoBox() {
         const infoBox = document.getElementById("info-box");
         infoBox.style.display = "flex";
@@ -302,7 +302,7 @@
         setInterval(updateWeather, 60000);
       }
 
-      // Update the date & time.
+      // Update the date and time in the info box.
       function updateDateTime() {
         const now = new Date();
         document.getElementById("date").innerText = now.toLocaleDateString();
@@ -310,7 +310,7 @@
       }
 
       // Retrieve live weather data by reverse-geocoding the user's position to obtain a city name,
-      // then querying wttr.in with that city name.
+      // then query wttr.in with the resulting city name.
       function updateWeather() {
         if (navigator.geolocation) {
           logEvent("Requesting geolocation...");
@@ -331,15 +331,13 @@
                   logEvent("Reverse geocoding result: " + city);
                   const url = `https://wttr.in/@${encodeURIComponent(city)}?format=j1`;
                   logEvent("Querying weather for " + city + " using URL: " + url);
-                  // Save city in a temporary variable for use after the weather fetch.
-                  const cityName = city;
                   return fetch(url)
                     .then(response => response.json())
                     .then(data => {
                       const temp = data.current_condition[0].temp_C;
                       const description = data.current_condition[0].weatherDesc[0].value;
-                      document.getElementById("weather").innerText = `${cityName} | ${temp}°C, ${description}`;
-                      logEvent("Weather updated: " + `${cityName} | ${temp}°C, ${description}`);
+                      document.getElementById("weather").innerText = `${city} | ${temp}°C, ${description}`;
+                      logEvent("Weather updated: " + `${city} | ${temp}°C, ${description}`);
                     });
                 })
                 .catch(err => {
@@ -349,7 +347,7 @@
             },
             error => {
               document.getElementById("weather").innerText = "Weather data unavailable";
-              logEvent("Geolocation Error: " + error.message, "error");
+              logEvent("Geolocation Error [code " + error.code + "]: " + error.message, "error");
             },
             { timeout: 10000 }
           );
