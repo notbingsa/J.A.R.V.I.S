@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Futuristic J.A.R.V.I.S Interface with Chat</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Futuristic J.A.R.V.I.S Interface with Advanced Chat</title>
   <!-- Import Inconsolata Font -->
   <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
   <!-- Import Font Awesome for the microphone icon -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-papXtj68WQRnoZlRm0HOVZPbMJsfH4a0xuY0mXkRn9tg4LtX8/EP8vbdqwQl1Z7zOZrmFervaHEaahGQG+D9ug==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" 
+    integrity="sha512-papXtj68WQRnoZlRm0HOVZPbMJsfH4a0xuY0mXkRn9tg4LtX8/EP8vbdqwQl1Z7zOZrmFervaHEaahGQG+D9ug=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
-    /* Global Resets & Background */
+    /* Global resets & background */
     html, body {
       margin: 0;
       padding: 0;
@@ -18,22 +20,20 @@
       font-family: 'Inconsolata', monospace;
       background-color: #000;
       background-image: repeating-linear-gradient(
-          0deg, rgba(255, 255, 255, 0.05) 0px, rgba(255, 255, 255, 0.05) 1px, transparent 1px, transparent 20px
-        ),
+          0deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 1px, transparent 1px, transparent 20px),
         repeating-linear-gradient(
-          90deg, rgba(255, 255, 255, 0.05) 0px, rgba(255, 255, 255, 0.05) 1px, transparent 1px, transparent 20px
-        );
+          90deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 1px, transparent 1px, transparent 20px);
       background-size: 20px 20px;
       color: #fff;
     }
-    /* Particles.js Container */
+    /* Particle background container */
     #particles-js {
       position: absolute;
       width: 100%;
       height: 100%;
       z-index: -2;
     }
-    /* Main UI Container (Grid) */
+    /* Main UI Container (Grid background) */
     #grid-container {
       position: relative;
       width: 100vw;
@@ -45,7 +45,7 @@
       justify-content: center;
       background-color: transparent;
     }
-    /* Boot Button Styling */
+    /* Boot Button styling */
     #boot-btn {
       background-color: transparent;
       border: 3px solid #fff;
@@ -101,7 +101,7 @@
       border: 1px solid #fff;
       min-height: 80px;
     }
-    /* Banner-style J.A.R.V.I.S Title & Typewriter Effect */
+    /* Banner-style J.A.R.V.I.S Title & Typewriter */
     #jarvisTitle {
       display: none;
       font-size: calc(4rem + 5vw);
@@ -123,7 +123,7 @@
       from { width: 0; }
       to { width: 11ch; }
     }
-    /* Info Box Styling (top-right) */
+    /* Info Box (top-right) */
     #info-box {
       position: absolute;
       top: 20px;
@@ -153,7 +153,7 @@
       right: 10px;
       font-size: 0.8rem;
     }
-    /* Red Microphone Button Styling */
+    /* Red Microphone Button */
     #mic-button {
       position: fixed;
       bottom: 20px;
@@ -198,13 +198,14 @@
       display: flex;
       flex-direction: column;
     }
-    /* Chat message bubbles: larger text and rounded boxes */
+    /* Chat message bubbles (larger text, rounded boxes) */
     .chat-message {
       max-width: 70%;
       margin: 10px 5px;
       padding: 15px;
       font-size: 1.5rem;
       border-radius: 15px;
+      word-wrap: break-word;
     }
     .chat-message.ai {
       background-color: #444;
@@ -240,7 +241,7 @@
   <!-- Particle Background Container -->
   <div id="particles-js"></div>
   
-  <!-- Main UI Container (Grid) -->
+  <!-- Main UI Container (Grid Background) -->
   <div id="grid-container">
     <!-- Boot Button -->
     <button id="boot-btn">BOOT J.A.R.V.I.S</button>
@@ -308,13 +309,36 @@
       "retina_detect": true
     });
     
-    // Logging function - logs events only to the console.
+    // Logging function - logs events exclusively to the console.
     function logEvent(message, type) {
       const timeStamp = new Date().toLocaleTimeString();
       if (type === "error") {
         console.error(timeStamp + " - " + message);
       } else {
         console.log(timeStamp + " - " + message);
+      }
+    }
+    
+    // --- Chat-specific AI request function ---
+    // Replace '/api/chat' with your actual AI endpoint.
+    async function getJarvisResponseFromAPI(userMessage) {
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ message: userMessage })
+        });
+        if (!response.ok) {
+          throw new Error("API response was not ok");
+        }
+        const data = await response.json();
+        // Expect data.response to contain the AI's reply.
+        return data.response;
+      } catch (err) {
+        logEvent("AI API Error: " + err, "error");
+        return "I'm sorry, I encountered an error while processing your request.";
       }
     }
     
@@ -402,7 +426,7 @@
         }, 50);
       }
       
-      // After typewriter animation, remove caret and show info box and microphone button.
+      // After the typewriter animation, remove the caret and show the info box and microphone button.
       typewriter.addEventListener("animationend", function () {
         typewriter.style.borderRight = "none";
         logEvent("Typewriter animation complete.");
@@ -430,7 +454,7 @@
         logEvent("Microphone button displayed.");
       }
       
-      // When the microphone button is clicked, transition to Chat UI.
+      // Transition to Chat UI when microphone button is clicked.
       micButton.addEventListener("click", function () {
         logEvent("Microphone button clicked. Transitioning to Chat UI.");
         document.getElementById("grid-container").style.display = "none";
@@ -439,20 +463,20 @@
       });
       
       // Chat UI: send message when button is clicked or Enter is pressed.
-      chatSend.addEventListener("click", function () {
-        sendChatMessage();
+      chatSend.addEventListener("click", async function () {
+        await sendChatMessage();
       });
-      chatInput.addEventListener("keypress", function (e) {
+      chatInput.addEventListener("keypress", async function (e) {
         if (e.key === "Enter") {
-          sendChatMessage();
+          await sendChatMessage();
         }
       });
       
-      // Append chat messages into the conversation view.
+      // Append chat message bubbles.
       function appendChatMessage(sender, text) {
         const messageElem = document.createElement("div");
         messageElem.classList.add("chat-message");
-        if(sender.toLowerCase() === "jarvis") {
+        if (sender.toLowerCase() === "jarvis") {
           messageElem.classList.add("ai");
         } else {
           messageElem.classList.add("user");
@@ -462,50 +486,28 @@
         chatConversation.scrollTop = chatConversation.scrollHeight;
       }
       
-      // Send the chat message then simulate Jarvis's response.
-      function sendChatMessage() {
+      // Send chat message and fetch AI response from the real AI endpoint.
+      async function sendChatMessage() {
         const message = chatInput.value.trim();
-        if(message !== "") {
+        if (message !== "") {
           appendChatMessage("You", message);
           chatInput.value = "";
-          // Improved Jarvis response logic.
-          setTimeout(() => {
-            const response = getJarvisResponse(message);
-            appendChatMessage("Jarvis", response);
-          }, 1000);
+          // Call the actual AI endpoint to get Jarvis's intelligent response.
+          const responseText = await getJarvisResponseFromAPI(message);
+          appendChatMessage("Jarvis", responseText);
         }
       }
       
-      // Enhanced response logic for Jarvis.
-      function getJarvisResponse(userMessage) {
-        const msg = userMessage.toLowerCase();
-        if(msg.includes("hello") || msg.includes("hi")) {
-          return "Hello, I'm Jarvis. How may I assist you today?";
-        } else if(msg.includes("time")) {
-          return "The current time is " + new Date().toLocaleTimeString() + ".";
-        } else if(msg.includes("date")) {
-          return "Today's date is " + new Date().toLocaleDateString() + ".";
-        } else if(msg.includes("weather")) {
-          return "You can check the info box in the top right for current weather details.";
-        } else if(msg.includes("who are you") || msg.includes("what is your name")) {
-          return "I'm Jarvis, your personal digital assistant.";
-        } else if(msg.includes("thank")) {
-          return "You're welcome!";
-        } else {
-          // A generic fallback response.
-          return "I'm here to help. Could you please clarify your request?";
-        }
-      }
-      
+      // Update date and time in the info box.
       function updateDateTime() {
         const now = new Date();
         document.getElementById("date").innerText = now.toLocaleDateString();
         document.getElementById("time").innerText = now.toLocaleTimeString();
       }
       
-      // Update weather: try native geolocation, then fallback.
+      // Update weather using native geolocation (with fallback via IP-based geolocation).
       function updateWeather() {
-        if(navigator.geolocation) {
+        if (navigator.geolocation) {
           logEvent("Requesting geolocation...");
           navigator.geolocation.getCurrentPosition(
             position => {
@@ -515,12 +517,7 @@
               fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`)
                 .then(response => response.json())
                 .then(geoData => {
-                  const city =
-                    geoData.address.city ||
-                    geoData.address.town ||
-                    geoData.address.village ||
-                    geoData.address.hamlet ||
-                    "Unknown";
+                  const city = geoData.address.city || geoData.address.town || geoData.address.village || geoData.address.hamlet || "Unknown";
                   logEvent("Reverse geocoding result: " + city);
                   const url = `https://wttr.in/@${encodeURIComponent(city)}?format=j1`;
                   logEvent("Querying weather for " + city + " using URL: " + url);
