@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Futuristic J.A.R.V.I.S Boot Sequence - Logging & Banner</title>
+  <!-- Import Inconsolata font -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    /* Global Styles & Background */
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background-color: #000;
+      background-image: repeating-linear-gradient(
+          0deg,
+          rgba(255, 255, 255, 0.05) 0px,
+          rgba(255, 255, 255, 0.05) 1px,
+          transparent 1px,
+          transparent 20px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.05) 0px,
+          rgba(255, 255, 255, 0.05) 1px,
+          transparent 1px,
+          transparent 20px
+        );
+      background-size: 20px 20px;
+      font-family: 'Inconsolata', monospace;
+      color: #fff;
+    }
+
+    /* Main container for centering content and relative positioning for the info box */
+    #grid-container {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    /* Boot Button Styling (outline only) */
+    #boot-btn {
+      background-color: transparent;
+      border: 3px solid #fff;
+      color: #fff;
+      font-size: 1.5rem;
+      padding: 1.5rem;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: opacity 1s ease;
+      width: 200px;
+      height: 200px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2;
+    }
+    #boot-btn.fade-out {
+      opacity: 0;
+    }
+
+    /* Boot Sequence Container with Progress & Terminal Output */
+    #boot-sequence {
+      display: none; /* Hidden initially */
+      width: 0;
+      max-width: 500px;
+      transition: width 2s ease;
+      margin: 20px 0;
+      text-align: left;
+    }
+    #progress-percentage {
+      font-size: 1rem;
+      text-align: right;
+      width: 100%;
+      margin-bottom: 5px;
+    }
+    #progress-container {
+      width: 100%;
+      height: 20px;
+      border: 1px solid #fff;
+      margin-bottom: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+    /* The inner progress bar (plain fill) */
+    #progress-bar {
+      width: 0%;
+      height: 100%;
+      background-color: #fff;
+      transition: width 0.05s linear;
+    }
+    #terminal-output {
+      font-size: 1rem;
+      background-color: #000;
+      padding: 10px;
+      border: 1px solid #fff;
+      min-height: 80px;
+    }
+
+    /* Banner-style J.A.R.V.I.S Title with Typewriter Effect */
+    #jarvisTitle {
+      display: none; /* Hidden initially */
+      font-size: calc(4rem + 5vw);
+      text-shadow: 4px 4px 0 #000; /* Black highlight */
+      margin: 20px 0;
+    }
+    #typewriter {
+      display: inline-block;
+      overflow: hidden;
+      white-space: nowrap;
+      border-right: 2px solid #fff;
+      width: 0;
+    }
+    #typewriter.animate {
+      animation: typing 3s steps(11, end) forwards;
+    }
+    @keyframes typing {
+      from { width: 0; }
+      to   { width: 11ch; }
+    }
+
+    /* Info Box Styling: Positioned in Top Right, Centered Content, No Labels */
+    #info-box {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: none;
+      opacity: 0;
+      width: 250px;
+      padding: 20px;
+      background-color: rgba(255,255,255,0.1);
+      border: 1px solid #fff;
+      border-radius: 15px;
+      transition: opacity 1s ease, transform 1s ease;
+      transform: scale(0.9);
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    #info-box.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+    /* "SYNCED" label in the top right corner of the info box */
+    .info-header {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      font-size: 0.8rem;
+    }
+
+    /* Log Area Styling */
+    #log-area {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      color: #fff;
+      font-family: 'Inconsolata', monospace;
+      font-size: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+      padding: 10px;
+      box-sizing: border-box;
+      z-index: 10;
+    }
+    .log-entry {
+      margin: 3px 0;
+    }
+    .log-error {
+      color: red;
+      font-size: 16px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div id="grid-container">
+    <!-- Boot Button -->
+    <button id="boot-btn">BOOT JAR.VIS</button>
+
+    <!-- Boot Sequence Container: Percentage, Progress Bar, and Terminal Output -->
+    <div id="boot-sequence">
+      <div id="progress-percentage">0%</div>
+      <div id="progress-container">
+        <div id="progress-bar"></div>
+      </div>
+      <div id="terminal-output"></div>
+    </div>
+
+    <!-- Banner-style J.A.R.V.I.S Title with Typewriter Effect -->
+    <h1 id="jarvisTitle">
+      <span id="typewriter">J.A.R.V.I.S</span>
+    </h1>
+
+    <!-- Info Box positioned in the top-right corner -->
+    <div id="info-box">
+      <div class="info-header">
+        <span id="sync-text">SYNCED</span>
+      </div>
+      <div class="info-content">
+        <div id="date"></div>
+        <div id="time"></div>
+        <div id="weather"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Log Area (for diagnostic messages and errors) -->
+  <div id="log-area"></div>
+
+  <script>
+    // Logging function that outputs to console and the on-screen log area.
+    function logEvent(message, type) {
+      console.log(message);
+      const logArea = document.getElementById("log-area");
+      const p = document.createElement("p");
+      p.className = "log-entry";
+      if (type === "error") {
+        p.classList.add("log-error");
+      }
+      p.textContent = new Date().toLocaleTimeString() + " - " + message;
+      logArea.appendChild(p);
+      logArea.scrollTop = logArea.scrollHeight;
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const bootBtn = document.getElementById("boot-btn");
+      const bootSequence = document.getElementById("boot-sequence");
+      const progressBar = document.getElementById("progress-bar");
+      const progressPercentage = document.getElementById("progress-percentage");
+      const terminalOutput = document.getElementById("terminal-output");
+      const jarvisTitle = document.getElementById("jarvisTitle");
+      const typewriter = document.getElementById("typewriter");
+
+      logEvent("Page loaded. Awaiting user action.");
+
+      bootBtn.addEventListener("click", function () {
+        logEvent("Boot button clicked.");
+        bootBtn.classList.add("fade-out");
+        setTimeout(function () {
+          logEvent("Boot button faded out.");
+          bootBtn.style.display = "none";
+          // Show and expand the boot sequence container.
+          bootSequence.style.display = "block";
+          logEvent("Boot sequence container displayed. Expanding...");
+          bootSequence.style.width = "0";
+          setTimeout(function () {
+            bootSequence.style.width = "80%";
+            logEvent("Boot sequence container expanding to 80% width.");
+          }, 50);
+          // Start progress simulation after expansion delay.
+          setTimeout(function () {
+            logEvent("Starting progress simulation over 10 seconds.");
+            simulateProgress(10000); // simulate progress over 10 seconds.
+          }, 2050);
+        }, 1000);
+      });
+
+      // Simulate progress and log terminal messages at set thresholds.
+      function simulateProgress(duration) {
+        const updates = [
+          { threshold: 10, message: ">> Initializing core systems...", printed: false },
+          { threshold: 20, message: ">> Loading modules...", printed: false },
+          { threshold: 40, message: ">> Accessing secure memory...", printed: false },
+          { threshold: 50, message: ">> Loading neural network architecture...", printed: false },
+          { threshold: 65, message: ">> Verifying system integrity...", printed: false },
+          { threshold: 80, message: ">> Calibrating sensors and processors...", printed: false },
+          { threshold: 90, message: ">> Initiating self-diagnostics...", printed: false },
+          { threshold: 100, message: ">> Boot sequence complete.", printed: false }
+        ];
+      
+        const startTime = Date.now();
+        const timer = setInterval(function () {
+          const elapsed = Date.now() - startTime;
+          let percent = Math.min((elapsed / duration) * 100, 100);
+          percent = Math.floor(percent);
+          
+          progressPercentage.innerText = percent + "%";
+          progressBar.style.width = percent + "%";
+
+          updates.forEach(update => {
+            if (!update.printed && percent >= update.threshold) {
+              terminalOutput.innerHTML += update.message + "<br>";
+              logEvent("Progress reached " + percent + "%: " + update.message);
+              update.printed = true;
+            }
+          });
+
+          if (percent >= 100) {
+            clearInterval(timer);
+            logEvent("Progress simulation complete.");
+            setTimeout(function () {
+              bootSequence.style.display = "none";
+              logEvent("Boot sequence container hidden.");
+              jarvisTitle.style.display = "block";
+              logEvent("J.A.R.V.I.S title displayed. Starting typewriter animation.");
+              typewriter.classList.add("animate");
+            }, 1000);
+          }
+        }, 50);
+      }
+
+      // After the typewriter animation, remove the caret and show the info box.
+      typewriter.addEventListener("animationend", function () {
+        typewriter.style.borderRight = "none";
+        logEvent("Typewriter animation complete.");
+        setTimeout(showInfoBox, 1000);
+      });
+
+      // Show the info box and start date/time/weather updates.
+      function showInfoBox() {
+        const infoBox = document.getElementById("info-box");
+        infoBox.style.display = "flex";
+        setTimeout(function () {
+          infoBox.classList.add("visible");
+          logEvent("Info box displayed and faded in.");
+        }, 50);
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+        updateWeather();
+        setInterval(updateWeather, 60000);
+      }
+
+      // Update date & time in the info box.
+      function updateDateTime() {
+        const now = new Date();
+        document.getElementById("date").innerText = now.toLocaleDateString();
+        document.getElementById("time").innerText = now.toLocaleTimeString();
+      }
+
+      // Fetch live weather data using geolocation and reverse geocoding to get a city name,
+      // then query wttr.in with that city.
+      function updateWeather() {
+        if (navigator.geolocation) {
+          logEvent("Requesting geolocation...");
+          navigator.geolocation.getCurrentPosition(
+            position => {
+              const lat = position.coords.latitude;
+              const lon = position.coords.longitude;
+              logEvent("Geolocation obtained: (" + lat.toFixed(3) + ", " + lon.toFixed(3) + "). Reverse geocoding...");
+              // Reverse geocode using Nominatim.
+              fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`)
+                .then(response => response.json())
+                .then(geoData => {
+                  const city =
+                    geoData.address.city ||
+                    geoData.address.town ||
+                    geoData.address.village ||
+                    geoData.address.hamlet ||
+                    "Unknown";
+                  logEvent("Reverse geocoding result: " + city);
+                  // Build URL for wttr.in using the determined city.
+                  const url = `https://wttr.in/@${encodeURIComponent(city)}?format=j1`;
+                  logEvent("Querying weather for " + city + " using URL: " + url);
+                  return fetch(url);
+                })
+                .then(response => response.json())
+                .then(data => {
+                  const temp = data.current_condition[0].temp_C;
+                  const description = data.current_condition[0].weatherDesc[0].value;
+                  const weatherText = `${temp}°C, ${description}`;
+                  document.getElementById("weather").innerText = cityNameForWeather + " | " + weatherText;
+                  logEvent("Weather updated: " + cityNameForWeather + " | " + weatherText);
+                })
+                .catch(err => {
+                  document.getElementById("weather").innerText = "Weather data unavailable";
+                  logEvent("Weather API Error: " + err, "error");
+                });
+            },
+            error => {
+              document.getElementById("weather").innerText = "Weather data unavailable";
+              logEvent("Geolocation Error: " + error.message, "error");
+            },
+            { timeout: 10000 }
+          );
+        } else {
+          document.getElementById("weather").innerText = "Geolocation not supported";
+          logEvent("Geolocation not supported by this browser.", "error");
+        }
+      }
+    });
+  </script>
+</body>
+</html>
