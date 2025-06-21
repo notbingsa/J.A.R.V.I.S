@@ -26,14 +26,14 @@
       background-size: 20px 20px;
       color: #fff;
     }
-    /* --- Particles.js Container --- */
+    /* Particles.js Container */
     #particles-js {
       position: absolute;
       width: 100%;
       height: 100%;
       z-index: -2;
     }
-    /* --- Main UI Container --- */
+    /* Main UI Container (Grid) */
     #grid-container {
       position: relative;
       width: 100vw;
@@ -45,7 +45,7 @@
       justify-content: center;
       background-color: transparent;
     }
-    /* --- Boot Button --- */
+    /* Boot Button Styling */
     #boot-btn {
       background-color: transparent;
       border: 3px solid #fff;
@@ -65,7 +65,7 @@
     #boot-btn.fade-out {
       opacity: 0;
     }
-    /* --- Boot Sequence Container --- */
+    /* Boot Sequence Container */
     #boot-sequence {
       display: none;
       width: 0;
@@ -101,7 +101,7 @@
       border: 1px solid #fff;
       min-height: 80px;
     }
-    /* --- Banner-style J.A.R.V.I.S Title & Typewriter Effect --- */
+    /* Banner-style J.A.R.V.I.S Title & Typewriter Effect */
     #jarvisTitle {
       display: none;
       font-size: calc(4rem + 5vw);
@@ -123,7 +123,7 @@
       from { width: 0; }
       to { width: 11ch; }
     }
-    /* --- Info Box (top-right) --- */
+    /* Info Box Styling (top-right) */
     #info-box {
       position: absolute;
       top: 20px;
@@ -153,7 +153,7 @@
       right: 10px;
       font-size: 0.8rem;
     }
-    /* --- Red Microphone Button --- */
+    /* Red Microphone Button Styling */
     #mic-button {
       position: fixed;
       bottom: 20px;
@@ -171,7 +171,7 @@
       cursor: pointer;
       z-index: 3;
     }
-    /* --- Chat UI --- */
+    /* Chat UI Styling */
     #chat-ui {
       display: none;
       position: fixed;
@@ -198,12 +198,12 @@
       display: flex;
       flex-direction: column;
     }
-    /* Chat message bubbles */
+    /* Chat message bubbles: larger text and rounded boxes */
     .chat-message {
       max-width: 70%;
       margin: 10px 5px;
       padding: 15px;
-      font-size: 1.2rem;
+      font-size: 1.5rem;
       border-radius: 15px;
     }
     .chat-message.ai {
@@ -240,7 +240,7 @@
   <!-- Particle Background Container -->
   <div id="particles-js"></div>
   
-  <!-- Main UI Container (Grid Background) -->
+  <!-- Main UI Container (Grid) -->
   <div id="grid-container">
     <!-- Boot Button -->
     <button id="boot-btn">BOOT J.A.R.V.I.S</button>
@@ -275,7 +275,7 @@
   <!-- Red Microphone Button -->
   <button id="mic-button"><i class="fas fa-microphone"></i></button>
   
-  <!-- Chat UI -->
+  <!-- Chat UI for conversation with Jarvis -->
   <div id="chat-ui">
     <div id="chat-header">J.A.R.V.I.S Chat</div>
     <div id="chat-conversation"></div>
@@ -341,7 +341,7 @@
           logEvent("Boot button faded out.");
           bootBtn.style.display = "none";
           
-          // Display and expand boot sequence container.
+          // Display and expand the boot sequence container.
           bootSequence.style.display = "block";
           logEvent("Boot sequence container displayed. Expanding...");
           bootSequence.style.width = "0";
@@ -430,7 +430,7 @@
         logEvent("Microphone button displayed.");
       }
       
-      // When the microphone button is clicked, transition to the Chat UI.
+      // When the microphone button is clicked, transition to Chat UI.
       micButton.addEventListener("click", function () {
         logEvent("Microphone button clicked. Transitioning to Chat UI.");
         document.getElementById("grid-container").style.display = "none";
@@ -438,7 +438,7 @@
         chatUI.style.display = "flex";
       });
       
-      // Chat UI functionality.
+      // Chat UI: send message when button is clicked or Enter is pressed.
       chatSend.addEventListener("click", function () {
         sendChatMessage();
       });
@@ -448,7 +448,7 @@
         }
       });
       
-      // Append a chat message with styling based on the sender.
+      // Append chat messages into the conversation view.
       function appendChatMessage(sender, text) {
         const messageElem = document.createElement("div");
         messageElem.classList.add("chat-message");
@@ -462,12 +462,13 @@
         chatConversation.scrollTop = chatConversation.scrollHeight;
       }
       
+      // Send the chat message then simulate Jarvis's response.
       function sendChatMessage() {
         const message = chatInput.value.trim();
         if(message !== "") {
           appendChatMessage("You", message);
           chatInput.value = "";
-          // Simulated response from Jarvis.
+          // Improved Jarvis response logic.
           setTimeout(() => {
             const response = getJarvisResponse(message);
             appendChatMessage("Jarvis", response);
@@ -475,8 +476,25 @@
         }
       }
       
+      // Enhanced response logic for Jarvis.
       function getJarvisResponse(userMessage) {
-        return "I'm here to assist you. You said: " + userMessage;
+        const msg = userMessage.toLowerCase();
+        if(msg.includes("hello") || msg.includes("hi")) {
+          return "Hello, I'm Jarvis. How may I assist you today?";
+        } else if(msg.includes("time")) {
+          return "The current time is " + new Date().toLocaleTimeString() + ".";
+        } else if(msg.includes("date")) {
+          return "Today's date is " + new Date().toLocaleDateString() + ".";
+        } else if(msg.includes("weather")) {
+          return "You can check the info box in the top right for current weather details.";
+        } else if(msg.includes("who are you") || msg.includes("what is your name")) {
+          return "I'm Jarvis, your personal digital assistant.";
+        } else if(msg.includes("thank")) {
+          return "You're welcome!";
+        } else {
+          // A generic fallback response.
+          return "I'm here to help. Could you please clarify your request?";
+        }
       }
       
       function updateDateTime() {
@@ -485,7 +503,7 @@
         document.getElementById("time").innerText = now.toLocaleTimeString();
       }
       
-      // Update weather: try native geolocation, then fallback to IP-based.
+      // Update weather: try native geolocation, then fallback.
       function updateWeather() {
         if(navigator.geolocation) {
           logEvent("Requesting geolocation...");
