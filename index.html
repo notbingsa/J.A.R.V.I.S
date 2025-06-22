@@ -1,53 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Futuristic J.A.R.V.I.S Interface with Advanced Chat</title>
-  <!-- Import Inconsolata Font -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>JARVIS Boot UI</title>
   <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
-  <!-- Import Font Awesome for the microphone icon -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" 
-    integrity="sha512-papXtj68WQRnoZlRm0HOVZPbMJsfH4a0xuY0mXkRn9tg4LtX8/EP8vbdqwQl1Z7zOZrmFervaHEaahGQG+D9ug=="
-    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <style>
-    /* Global resets & background */
     html, body {
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
       height: 100%;
-      overflow: hidden;
       font-family: 'Inconsolata', monospace;
       background-color: #000;
-      background-image: repeating-linear-gradient(
-          0deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 1px, transparent 1px, transparent 20px),
-        repeating-linear-gradient(
-          90deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 1px, transparent 1px, transparent 20px);
+      background-image:
+        repeating-linear-gradient(0deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 1px, transparent 1px, transparent 20px),
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 1px, transparent 1px, transparent 20px);
       background-size: 20px 20px;
       color: #fff;
+      overflow: hidden;
     }
-    /* Particle background container */
+
     #particles-js {
       position: absolute;
+      top: 0; left: 0;
       width: 100%;
       height: 100%;
-      z-index: -2;
+      z-index: 2;
+      display: none;
     }
-    /* Main UI Container (Grid background) */
+
     #grid-container {
+      z-index: 1;
       position: relative;
       width: 100vw;
       height: 100vh;
-      z-index: 1;
       display: flex;
       flex-direction: column;
-      align-items: center;
       justify-content: center;
-      background-color: transparent;
+      align-items: center;
     }
-    /* Boot Button styling */
+
     #boot-btn {
-      background-color: transparent;
+      background: transparent;
       border: 3px solid #fff;
       color: #fff;
       font-size: 1.5rem;
@@ -60,12 +54,10 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 2;
+      z-index: 3;
     }
-    #boot-btn.fade-out {
-      opacity: 0;
-    }
-    /* Boot Sequence Container */
+    #boot-btn.fade-out { opacity: 0; }
+
     #boot-sequence {
       display: none;
       width: 0;
@@ -73,14 +65,16 @@
       transition: width 2s ease;
       margin: 20px 0;
       text-align: left;
-      z-index: 2;
+      z-index: 3;
     }
+
     #progress-percentage {
       font-size: 1rem;
       text-align: right;
       width: 100%;
       margin-bottom: 5px;
     }
+
     #progress-container {
       width: 100%;
       height: 20px;
@@ -88,12 +82,14 @@
       margin-bottom: 10px;
       overflow: hidden;
     }
+
     #progress-bar {
       width: 0%;
       height: 100%;
       background-color: #fff;
       transition: width 0.05s linear;
     }
+
     #terminal-output {
       font-size: 1rem;
       background-color: #000;
@@ -101,14 +97,15 @@
       border: 1px solid #fff;
       min-height: 80px;
     }
-    /* Banner-style J.A.R.V.I.S Title & Typewriter */
+
     #jarvisTitle {
       display: none;
       font-size: calc(4rem + 5vw);
       text-shadow: 4px 4px 0 #000;
       margin: 20px 0;
-      z-index: 2;
+      z-index: 3;
     }
+
     #typewriter {
       display: inline-block;
       overflow: hidden;
@@ -116,14 +113,16 @@
       border-right: 2px solid #fff;
       width: 0;
     }
+
     #typewriter.animate {
       animation: typing 3s steps(11, end) forwards;
     }
+
     @keyframes typing {
       from { width: 0; }
       to { width: 11ch; }
     }
-    /* Info Box (top-right) */
+
     #info-box {
       position: absolute;
       top: 20px;
@@ -143,17 +142,19 @@
       text-align: center;
       z-index: 3;
     }
+
     #info-box.visible {
       opacity: 1;
       transform: scale(1);
     }
+
     .info-header {
       position: absolute;
       top: 5px;
       right: 10px;
       font-size: 0.8rem;
     }
-    /* Red Microphone Button */
+
     #mic-button {
       position: fixed;
       bottom: 20px;
@@ -171,82 +172,14 @@
       cursor: pointer;
       z-index: 3;
     }
-    /* Chat UI Styling */
-    #chat-ui {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: #111;
-      color: #fff;
-      font-family: 'Inconsolata', monospace;
-      z-index: 10;
-      flex-direction: column;
-    }
-    #chat-header {
-      padding: 20px;
-      background-color: #222;
-      font-size: 1.5rem;
-      text-align: center;
-    }
-    #chat-conversation {
-      flex: 1;
-      padding: 20px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-    }
-    /* Chat message bubbles (larger text, rounded boxes) */
-    .chat-message {
-      max-width: 70%;
-      margin: 10px 5px;
-      padding: 15px;
-      font-size: 1.5rem;
-      border-radius: 15px;
-      word-wrap: break-word;
-    }
-    .chat-message.ai {
-      background-color: #444;
-      align-self: flex-start;
-    }
-    .chat-message.user {
-      background-color: #2ecc71;
-      align-self: flex-end;
-    }
-    #chat-input-container {
-      padding: 10px;
-      background-color: #222;
-      display: flex;
-    }
-    #chat-input {
-      flex: 1;
-      padding: 10px;
-      font-size: 1rem;
-      border: none;
-      outline: none;
-    }
-    #chat-send {
-      padding: 10px 20px;
-      background-color: #e74c3c;
-      border: none;
-      cursor: pointer;
-      font-size: 1rem;
-      color: #fff;
-    }
   </style>
 </head>
 <body>
-  <!-- Particle Background Container -->
-  <div id="particles-js"></div>
-  
-  <!-- Main UI Container (Grid Background) -->
+
+  <!-- Boot UI Elements -->
   <div id="grid-container">
-    <!-- Boot Button -->
     <button id="boot-btn">BOOT JARVIS</button>
-    
-    <!-- Boot Sequence Container -->
+
     <div id="boot-sequence">
       <div id="progress-percentage">0%</div>
       <div id="progress-container">
@@ -254,17 +187,11 @@
       </div>
       <div id="terminal-output"></div>
     </div>
-    
-    <!-- Banner-style J.A.R.V.I.S Title -->
-    <h1 id="jarvisTitle">
-      <span id="typewriter">J.A.R.V.I.S</span>
-    </h1>
-    
-    <!-- Info Box -->
+
+    <h1 id="jarvisTitle"><span id="typewriter">J.A.R.V.I.S</span></h1>
+
     <div id="info-box">
-      <div class="info-header">
-        <span id="sync-text">SYNCED</span>
-      </div>
+      <div class="info-header"><span id="sync-text">SYNCED</span></div>
       <div class="info-content">
         <div id="date"></div>
         <div id="time"></div>
@@ -272,284 +199,164 @@
       </div>
     </div>
   </div>
-  
-  <!-- Red Microphone Button -->
+
+  <!-- Particles - loaded after title animation -->
+  <div id="particles-js"></div>
+
+  <!-- Mic Button -->
   <button id="mic-button"><i class="fas fa-microphone"></i></button>
-  
-  <!-- Chat UI for conversation with Jarvis -->
-  <div id="chat-ui">
-    <div id="chat-header">J.A.R.V.I.S Chat</div>
-    <div id="chat-conversation"></div>
-    <div id="chat-input-container">
-      <input type="text" id="chat-input" placeholder="Type your message...">
-      <button id="chat-send">Send</button>
-    </div>
-  </div>
-  
+
   <!-- Scripts -->
-  <!-- Include particles.js -->
   <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
   <script>
-    // Initialize particles.js with a sample configuration.
-    particlesJS("particles-js", {
-      "particles": {
-        "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
-        "color": { "value": "#ffffff" },
-        "shape": { "type": "circle", "stroke": { "width": 0, "color": "#000000" }, "polygon": { "nb_sides": 5 } },
-        "opacity": { "value": 0.5, "random": false },
-        "size": { "value": 3, "random": true },
-        "line_linked": { "enable": true, "distance": 150, "color": "#ffffff", "opacity": 0.4, "width": 1 },
-        "move": { "enable": true, "speed": 6, "direction": "none", "random": false, "straight": false, "out_mode": "out" }
-      },
-      "interactivity": {
-        "detect_on": "canvas",
-        "events": { "onhover": { "enable": true, "mode": "repulse" }, "onclick": { "enable": true, "mode": "push" }, "resize": true },
-        "modes": { "repulse": { "distance": 200 } }
-      },
-      "retina_detect": true
-    });
-    
-    // Logging function - logs events exclusively to the console.
-    function logEvent(message, type) {
-      const timeStamp = new Date().toLocaleTimeString();
-      if (type === "error") {
-        console.error(timeStamp + " - " + message);
-      } else {
-        console.log(timeStamp + " - " + message);
-      }
-    }
-    
-    // --- Chat-specific AI request function ---
-    // Replace '/api/chat' with your actual AI endpoint.
-    async function getJarvisResponseFromAPI(userMessage) {
-      try {
-        const response = await fetch('/api/chat', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ message: userMessage })
-        });
-        if (!response.ok) {
-          throw new Error("API response was not ok");
-        }
-        const data = await response.json();
-        // Expect data.response to contain the AI's reply.
-        return data.response;
-      } catch (err) {
-        logEvent("AI API Error: " + err, "error");
-        return "I'm sorry, I encountered an error while processing your request.";
-      }
-    }
-    
-    document.addEventListener("DOMContentLoaded", function () {
-      const bootBtn = document.getElementById("boot-btn");
-      const bootSequence = document.getElementById("boot-sequence");
-      const progressBar = document.getElementById("progress-bar");
-      const progressPercentage = document.getElementById("progress-percentage");
-      const terminalOutput = document.getElementById("terminal-output");
-      const jarvisTitle = document.getElementById("jarvisTitle");
-      const typewriter = document.getElementById("typewriter");
-      const micButton = document.getElementById("mic-button");
-      const chatUI = document.getElementById("chat-ui");
-      const chatConversation = document.getElementById("chat-conversation");
-      const chatInput = document.getElementById("chat-input");
-      const chatSend = document.getElementById("chat-send");
-      
-      logEvent("Page loaded. Awaiting user action.");
-      
-      bootBtn.addEventListener("click", function () {
-        logEvent("Boot button clicked.");
-        bootBtn.classList.add("fade-out");
-        setTimeout(function () {
-          logEvent("Boot button faded out.");
-          bootBtn.style.display = "none";
-          
-          // Display and expand the boot sequence container.
-          bootSequence.style.display = "block";
-          logEvent("Boot sequence container displayed. Expanding...");
-          bootSequence.style.width = "0";
-          setTimeout(function () {
-            bootSequence.style.width = "80%";
-            logEvent("Boot sequence container expanding to 80% width.");
-          }, 50);
-          
-          // Start progress simulation.
-          setTimeout(function () {
-            logEvent("Starting progress simulation over 10 seconds.");
-            simulateProgress(10000);
-          }, 2050);
-        }, 1000);
-      });
-      
-      // Simulate progress with terminal updates.
-      function simulateProgress(duration) {
-        const updates = [
-          { threshold: 10, message: ">> Initializing core systems...", printed: false },
-          { threshold: 20, message: ">> Loading modules...", printed: false },
-          { threshold: 40, message: ">> Accessing secure memory...", printed: false },
-          { threshold: 50, message: ">> Loading neural network architecture...", printed: false },
-          { threshold: 65, message: ">> Verifying system integrity...", printed: false },
-          { threshold: 80, message: ">> Calibrating sensors and processors...", printed: false },
-          { threshold: 90, message: ">> Initiating self-diagnostics...", printed: false },
-          { threshold: 100, message: ">> Boot sequence complete.", printed: false }
-        ];
-        
-        const startTime = Date.now();
-        const timer = setInterval(function () {
-          const elapsed = Date.now() - startTime;
-          let percent = Math.min((elapsed / duration) * 100, 100);
-          percent = Math.floor(percent);
-          
-          progressPercentage.innerText = percent + "%";
-          progressBar.style.width = percent + "%";
-          
-          updates.forEach(update => {
-            if (!update.printed && percent >= update.threshold) {
-              terminalOutput.innerHTML += update.message + "<br>";
-              logEvent("Progress reached " + percent + "%: " + update.message);
-              update.printed = true;
-            }
-          });
-          
-          if (percent >= 100) {
-            clearInterval(timer);
-            logEvent("Progress simulation complete.");
-            setTimeout(function () {
-              bootSequence.style.display = "none";
-              logEvent("Boot sequence container hidden.");
-              jarvisTitle.style.display = "block";
-              logEvent("J.A.R.V.I.S title displayed. Starting typewriter animation.");
-              typewriter.classList.add("animate");
-            }, 1000);
-          }
-        }, 50);
-      }
-      
-      // After the typewriter animation, remove the caret and show the info box and microphone button.
-      typewriter.addEventListener("animationend", function () {
-        typewriter.style.borderRight = "none";
-        logEvent("Typewriter animation complete.");
-        setTimeout(function () {
-          showInfoBox();
-          showMicButton();
-        }, 1000);
-      });
-      
-      function showInfoBox() {
-        const infoBox = document.getElementById("info-box");
-        infoBox.style.display = "flex";
-        setTimeout(function () {
-          infoBox.classList.add("visible");
-          logEvent("Info box displayed and faded in.");
-        }, 50);
-        updateDateTime();
-        setInterval(updateDateTime, 1000);
-        updateWeather();
-        setInterval(updateWeather, 60000);
-      }
-      
-      function showMicButton() {
-        micButton.style.display = "flex";
-        logEvent("Microphone button displayed.");
-      }
-      
-      // Transition to Chat UI when microphone button is clicked.
-      micButton.addEventListener("click", function () {
-        logEvent("Microphone button clicked. Transitioning to Chat UI.");
-        document.getElementById("grid-container").style.display = "none";
-        micButton.style.display = "none";
-        chatUI.style.display = "flex";
-      });
-      
-      // Chat UI: send message when button is clicked or Enter is pressed.
-      chatSend.addEventListener("click", async function () {
-        await sendChatMessage();
-      });
-      chatInput.addEventListener("keypress", async function (e) {
-        if (e.key === "Enter") {
-          await sendChatMessage();
-        }
-      });
-      
-      // Append chat message bubbles.
-      function appendChatMessage(sender, text) {
-        const messageElem = document.createElement("div");
-        messageElem.classList.add("chat-message");
-        if (sender.toLowerCase() === "jarvis") {
-          messageElem.classList.add("ai");
-        } else {
-          messageElem.classList.add("user");
-        }
-        messageElem.innerText = text;
-        chatConversation.appendChild(messageElem);
-        chatConversation.scrollTop = chatConversation.scrollHeight;
-      }
-      
-      // Send chat message and fetch AI response from the real AI endpoint.
-      async function sendChatMessage() {
-        const message = chatInput.value.trim();
-        if (message !== "") {
-          appendChatMessage("You", message);
-          chatInput.value = "";
-          // Call the actual AI endpoint to get Jarvis's intelligent response.
-          const responseText = await getJarvisResponseFromAPI(message);
-          appendChatMessage("Jarvis", responseText);
-        }
-      }
-      
-      // Update date and time in the info box.
-      function updateDateTime() {
-        const now = new Date();
-        document.getElementById("date").innerText = now.toLocaleDateString();
-        document.getElementById("time").innerText = now.toLocaleTimeString();
-      }
-      
-      // Update weather using native geolocation (with fallback via IP-based geolocation).
-      function updateWeather() {
-  logEvent("Fetching weather from WeatherAPI.com...");
-  fetch("https://api.weatherapi.com/v1/current.json?key=da42f1a5b91c4b92a7e63242252206&q=auto:ip")
-    .then(response => response.json())
-    .then(data => {
-      const city = data.location.name;
-      const region = data.location.region;
-      const country = data.location.country;
-      const temp = Math.round(data.current.temp_c);
-      const condition = data.current.condition.text;
-      document.getElementById("weather").innerText = `${city}, ${region} | ${temp}°C, ${condition}`;
-      logEvent(`Weather updated: ${city}, ${region} | ${temp}°C, ${condition}`);
-    })
-    .catch(err => {
-      document.getElementById("weather").innerText = "Weather data unavailable";
-      logEvent("Weather API error: " + err, "error");
-    });
-}
+    const bootBtn = document.getElementById("boot-btn");
+    const bootSequence = document.getElementById("boot-sequence");
+    const progressBar = document.getElementById("progress-bar");
+    const progressPercentage = document.getElementById("progress-percentage");
+    const terminalOutput = document.getElementById("terminal-output");
+    const jarvisTitle = document.getElementById("jarvisTitle");
+    const typewriter = document.getElementById("typewriter");
+    const infoBox = document.getElementById("info-box");
+    const micButton = document.getElementById("mic-button");
+    const particlesDiv = document.getElementById("particles-js");
 
-      
-      function fallbackToIP() {
-        logEvent("Using IP-based geolocation (ip-api.com) as fallback.");
-        fetch("https://ip-api.com/json/")
-          .then(response => response.json())
-          .then(data => {
-            const city = data.city || "Unknown";
-            logEvent("IP geolocation result: " + city);
-            const url = `https://wttr.in/@${encodeURIComponent(city)}?format=j1`;
-            logEvent("Querying weather for " + city + " using URL: " + url);
-            return fetch(url)
-              .then(response => response.json())
-              .then(data => {
-                const temp = data.current_condition[0].temp_C;
-                const description = data.current_condition[0].weatherDesc[0].value;
-                document.getElementById("weather").innerText = `${city} | ${temp}°C, ${description}`;
-                logEvent("Weather updated via IP fallback: " + `${city} | ${temp}°C, ${description}`);
-              });
-          })
-          .catch(err => {
-            document.getElementById("weather").innerText = "Weather data unavailable";
-            logEvent("IP Geolocation Error: " + err, "error");
-          });
+    function logEvent(msg, type = "") {
+      const time = new Date().toLocaleTimeString();
+      if (type === "error") {
+        console.error(`${time} - ${msg}`);
+      } else {
+        console.log(`${time} - ${msg}`);
       }
+    }
+
+    bootBtn.addEventListener("click", () => {
+      logEvent("Boot button clicked.");
+      bootBtn.classList.add("fade-out");
+      setTimeout(() => {
+        bootBtn.style.display = "none";
+        bootSequence.style.display = "block";
+        setTimeout(() => { bootSequence.style.width = "80%"; }, 50);
+        simulateProgress(10000);
+      }, 1000);
     });
+
+    function simulateProgress(duration) {
+      const updates = [
+        { percent: 10, msg: ">> Initializing core systems..." },
+        { percent: 20, msg: ">> Loading modules..." },
+        { percent: 40, msg: ">> Accessing secure memory..." },
+        { percent: 50, msg: ">> Loading neural network architecture..." },
+        { percent: 65, msg: ">> Verifying system integrity..." },
+        { percent: 80, msg: ">> Calibrating sensors and processors..." },
+        { percent: 90, msg: ">> Initiating self-diagnostics..." },
+        { percent: 100, msg: ">> Boot sequence complete." }
+      ];
+      const start = Date.now();
+      const timer = setInterval(() => {
+        const elapsed = Date.now() - start;
+        const percent = Math.min((elapsed / duration) * 100
+                                         const elapsed = Date.now() - start;
+        const percent = Math.min((elapsed / duration) * 100, 100);
+        progressPercentage.innerText = Math.floor(percent) + "%";
+        progressBar.style.width = percent + "%";
+
+        updates.forEach(update => {
+          if (!update.done && percent >= update.percent) {
+            terminalOutput.innerHTML += update.msg + "<br>";
+            update.done = true;
+          }
+        });
+
+        if (percent >= 100) {
+          clearInterval(timer);
+          setTimeout(() => {
+            bootSequence.style.display = "none";
+            jarvisTitle.style.display = "block";
+            typewriter.classList.add("animate");
+          }, 1000);
+        }
+      }, 50);
+    }
+
+    typewriter.addEventListener("animationend", function () {
+      typewriter.style.borderRight = "none";
+
+      // Show particles after typewriter effect
+      particlesDiv.style.display = "block";
+      particlesJS("particles-js", {
+        particles: {
+          number: { value: 80, density: { enable: true, value_area: 800 } },
+          color: { value: "#ffffff" },
+          shape: { type: "circle" },
+          opacity: { value: 0.5 },
+          size: { value: 3, random: true },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: "#ffffff",
+            opacity: 0.4,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 6,
+            direction: "none",
+            random: false,
+            straight: false,
+            out_mode: "out"
+          }
+        },
+        interactivity: {
+          detect_on: "canvas",
+          events: {
+            onhover: { enable: true, mode: "repulse" },
+            onclick: { enable: true, mode: "push" },
+            resize: true
+          },
+          modes: {
+            repulse: { distance: 200 },
+            push: { particles_nb: 4 }
+          }
+        },
+        retina_detect: true
+      });
+
+      setTimeout(() => {
+        showInfoBox();
+        micButton.style.display = "flex";
+      }, 1000);
+    });
+
+    function showInfoBox() {
+      infoBox.style.display = "flex";
+      setTimeout(() => infoBox.classList.add("visible"), 50);
+      updateDateTime();
+      updateWeather();
+      setInterval(updateDateTime, 1000);
+      setInterval(updateWeather, 60000);
+    }
+
+    function updateDateTime() {
+      const now = new Date();
+      document.getElementById("date").innerText = now.toLocaleDateString();
+      document.getElementById("time").innerText = now.toLocaleTimeString();
+    }
+
+    function updateWeather() {
+      fetch("https://api.weatherapi.com/v1/current.json?key=da42f1a5b91c4b92a7e63242252206&q=auto:ip")
+        .then(res => res.json())
+        .then(data => {
+          const loc = data.location;
+          const cond = data.current.condition.text;
+          const temp = data.current.temp_c;
+          document.getElementById("weather").innerText =
+            `${loc.name}, ${loc.region} | ${Math.round(temp)}°C, ${cond}`;
+        })
+        .catch(err => {
+          console.error("Weather error:", err);
+          document.getElementById("weather").innerText = "Weather data unavailable";
+        });
+    }
   </script>
 </body>
 </html>
