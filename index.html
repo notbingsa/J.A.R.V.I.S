@@ -244,7 +244,7 @@
   <!-- Main UI Container (Grid Background) -->
   <div id="grid-container">
     <!-- Boot Button -->
-    <button id="boot-btn">BOOT J.A.R.V.I.S</button>
+    <button id="boot-btn">BOOT JARVIS</button>
     
     <!-- Boot Sequence Container -->
     <div id="boot-sequence">
@@ -507,47 +507,24 @@
       
       // Update weather using native geolocation (with fallback via IP-based geolocation).
       function updateWeather() {
-        if (navigator.geolocation) {
-          logEvent("Requesting geolocation...");
-          navigator.geolocation.getCurrentPosition(
-            position => {
-              const lat = position.coords.latitude;
-              const lon = position.coords.longitude;
-              logEvent("Geolocation obtained: (" + lat.toFixed(3) + ", " + lon.toFixed(3) + "). Reverse geocoding...");
-              fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`)
-                .then(response => response.json())
-                .then(geoData => {
-                  const city = geoData.address.city || geoData.address.town || geoData.address.village || geoData.address.hamlet || "Unknown";
-                  logEvent("Reverse geocoding result: " + city);
-                  const url = `https://wttr.in/@${encodeURIComponent(city)}?format=j1`;
-                  logEvent("Querying weather for " + city + " using URL: " + url);
-                  return fetch(url)
-                    .then(response => response.json())
-                    .then(data => {
-                      const temp = data.current_condition[0].temp_C;
-                      const description = data.current_condition[0].weatherDesc[0].value;
-                      document.getElementById("weather").innerText = `${city} | ${temp}°C, ${description}`;
-                      logEvent("Weather updated: " + `${city} | ${temp}°C, ${description}`);
-                    });
-                })
-                .catch(err => {
-                  document.getElementById("weather").innerText = "Weather data unavailable";
-                  logEvent("Weather API Error: " + err, "error");
-                  fallbackToIP();
-                });
-            },
-            error => {
-              logEvent("Native Geolocation Error [code " + error.code + "]: " + error.message + ". Falling back to IP geolocation.", "error");
-              fallbackToIP();
-            },
-            { timeout: 10000 }
-          );
-        } else {
-          document.getElementById("weather").innerText = "Geolocation not supported";
-          logEvent("Geolocation not supported by this browser.", "error");
-          fallbackToIP();
-        }
-      }
+  logEvent("Fetching weather from WeatherAPI.com...");
+  fetch("https://api.weatherapi.com/v1/current.json?key=da42f1a5b91c4b92a7e63242252206&q=auto:ip")
+    .then(response => response.json())
+    .then(data => {
+      const city = data.location.name;
+      const region = data.location.region;
+      const country = data.location.country;
+      const temp = Math.round(data.current.temp_c);
+      const condition = data.current.condition.text;
+      document.getElementById("weather").innerText = `${city}, ${region} | ${temp}°C, ${condition}`;
+      logEvent(`Weather updated: ${city}, ${region} | ${temp}°C, ${condition}`);
+    })
+    .catch(err => {
+      document.getElementById("weather").innerText = "Weather data unavailable";
+      logEvent("Weather API error: " + err, "error");
+    });
+}
+
       
       function fallbackToIP() {
         logEvent("Using IP-based geolocation (ip-api.com) as fallback.");
